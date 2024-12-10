@@ -1,6 +1,5 @@
-
-function globalError (err,req,res,next){
-    return new Error("handled by globals",{err})
+function globalError(err, req, res, next) {
+  res.json({ msg: err });
 }
 
-export default globalError
+export default globalError;
