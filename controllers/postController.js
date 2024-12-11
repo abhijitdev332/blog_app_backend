@@ -10,7 +10,7 @@ const getPost = async (req, res) => {
   const post = await postModal.findById(id).populate("author");
   res.status(200).json({ msg: "success", data: post });
 };
-const getAllPosts = async (req, res) => {
+const getAllPublishPosts = async (req, res) => {
   // const { limit = 5, skip = 0 } = req.params;
   let posts = await postModal.find({ status: "published" }).populate("author");
   res.status(200).json({ msg: "success", data: posts });
@@ -68,7 +68,7 @@ const getUserPosts = async (req, res) => {
 
 export {
   getPost,
-  getAllPosts,
+  getAllPublishPosts,
   getRelatedPost,
   UpdatePost,
   deletePost,

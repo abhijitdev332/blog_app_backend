@@ -4,7 +4,7 @@ const router = express.Router();
 // import files
 import {
   getPost,
-  getAllPosts,
+  getAllPublishPosts,
   UpdatePost,
   deletePost,
   getRelatedPost,
@@ -18,7 +18,7 @@ import { verifyToken } from "../middleware/adminPermit.js";
 router.post("/create", verifyToken, asyncWrapper(createPost));
 router.get("/trending", asyncWrapper(getTrendingPost));
 router.get("/user/:userId", verifyToken, asyncWrapper(getUserPosts));
-router.get("/", asyncWrapper(getAllPosts));
+router.get("/", asyncWrapper(getAllPublishPosts));
 router.get("/related/:id", asyncWrapper(getRelatedPost));
 router.get("/:id", asyncWrapper(getPost));
 router.put("/:id", verifyToken, asyncWrapper(UpdatePost));

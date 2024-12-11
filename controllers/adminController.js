@@ -9,6 +9,18 @@ const getAdminAllPosts = async (req, res) => {
   }
   res.status(200).json({ msg: "successfull", data: posts });
 };
+const UpdatePostStatus = async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+  let updatedPost = await postModal.findByIdAndUpdate(
+    id,
+    { status },
+    { new: true, runValidators: true }
+  );
+  updatedPost.updatePublish();
+  res.status(200).json({ msg: "success", data: updatedPost });
+};
+
 const getAllUsers = async (req, res) => {
   const { limit = 5, skip = 0 } = req.params;
   let allUser = await UserModal.find({}).limit(limit).skip(skip);
@@ -37,4 +49,4 @@ const updateUser = async (req, res) => {
   res.status(200).json({ msg: "successfull" });
 };
 
-export { getAdminAllPosts, getAllUsers, updateUser };
+export { getAdminAllPosts, getAllUsers, updateUser, UpdatePostStatus };
