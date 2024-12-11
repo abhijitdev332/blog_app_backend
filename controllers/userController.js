@@ -1,70 +1,57 @@
 import { UserModal } from "../models/user.js";
-export async function getAllUser(req, res) {
-  const allUser = await UserModal.find();
-  res.json({
-    status: "success",
-    code: 200,
-    data: [...allUser],
-  });
-}
 export async function createUser(req, res) {
-  const { username, email, password, roles, isActive } = req.body;
+  const { username, email, password } = req.body;
   const user = new UserModal({
     username,
     email,
     password,
-    roles,
-    isActive,
   });
   let savedUser = await user.save();
-
-  res
-    .json({
-      status: "success",
-      code: 201,
-      user: savedUser,
-    })
-    .status(201);
+  if (!savedUser) {
+    return res.status(500).json({ msg: "something went wrong" });
+  }
+  let resUser = { ...savedUser._doc };
+  delete resUser?.password;
+  res.status(201).json({
+    msg: "success",
+    data: resUser,
+  });
 }
-
 export async function getUser(req, res) {
   const { id } = req.params;
 
   const matchedUser = await UserModal.findOne({ _id: id });
-
-  res.json({
-    status: "success",
-    code: 200,
-    user: matchedUser,
+  res.status(200).json({
+    msg: "success",
+    data: matchedUser,
   });
 }
-
 export async function updateUser(req, res) {
   const { id } = req.params;
-  const updates = req.body;
+  const { username, email, password } = req.body;
 
   const updatedUser = await UserModal.findByIdAndUpdate(
     id,
-    { ...updates },
+    { username, email, password },
     {
       new: true,
       runValidators: true,
     }
   );
 
-  res.json({
-    status: "success",
-    code: 200,
-    user: updatedUser,
+  res.status(200).json({
+    msg: "success",
+    data: updatedUser,
   });
 }
 export async function deleteUser(req, res) {
   const { id } = req.params;
 
   const deletedUser = await UserModal.findByIdAndDelete(id);
-
-  res.json({
-    status: "success",
-    code: 204,
+  if (!deletedUser) {
+    return res.status(500).json({ msg: "something went wrong please retry" });
+  }
+  res.status(200).json({
+    msg: "success",
   });
 }

@@ -9,14 +9,18 @@ import {
   deletePost,
   getRelatedPost,
   createPost,
+  getTrendingPost,
+  getUserPosts,
 } from "../controllers/postController.js";
 import asyncWrapper from "../utils/asyncWrapper.js";
 import { verifyToken } from "../middleware/adminPermit.js";
 
 router.post("/create", verifyToken, asyncWrapper(createPost));
-router.get("/:id", asyncWrapper(getPost));
-router.get("/", verifyToken, asyncWrapper(getAllPosts));
+router.get("/trending", asyncWrapper(getTrendingPost));
+router.get("/user/:userId", verifyToken, asyncWrapper(getUserPosts));
+router.get("/", asyncWrapper(getAllPosts));
 router.get("/related/:id", asyncWrapper(getRelatedPost));
+router.get("/:id", asyncWrapper(getPost));
 router.put("/:id", verifyToken, asyncWrapper(UpdatePost));
 router.delete("/:id", verifyToken, asyncWrapper(deletePost));
 

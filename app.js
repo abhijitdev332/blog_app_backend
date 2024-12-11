@@ -10,6 +10,7 @@ import cors from "cors";
 import userRoutes from "./routes/userRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import postRoutes from "./routes/postRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 
 dotenv.config();
 app.use(
@@ -47,6 +48,7 @@ app.get("/", (req, res, next) => {
 app.use("/user", userRoutes);
 app.use("/auth", authRoutes);
 app.use("/post", postRoutes);
+app.use("/admin", adminRoutes);
 
 app.use("/*", globalError);
 

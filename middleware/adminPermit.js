@@ -4,7 +4,6 @@ export const adminPermit = (req, res, next) => {
   // verify the jwt token
   verifyToken(req, res, () => {
     if (req?.user?.roles?.includes("admin")) {
-      console.log(req?.user);
       return next();
     } else {
       return res.status(401).json({ msg: "you are not authenticated " });
@@ -21,12 +20,10 @@ export const verifyToken = (req, res, next) => {
   // const session = req.session.token;
   if (token) {
     jwt.verify(token, secret, (err, data) => {
-      console.log(data);
       if (err) {
         console.log("err");
         return res.status(403).json({ message: "token is invalid" });
       } else {
-        console.log("token runn");
         req.user = data;
         return next();
       }
