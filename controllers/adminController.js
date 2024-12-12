@@ -22,7 +22,7 @@ const UpdatePostStatus = async (req, res) => {
 };
 
 const getAllUsers = async (req, res) => {
-  const { limit = 5, skip = 0 } = req.params;
+  const { limit = 20, skip = 0 } = req.params;
   let allUser = await UserModal.find({}).limit(limit).skip(skip);
   if (!allUser) {
     return res.status(500).json({ msg: "server error" });

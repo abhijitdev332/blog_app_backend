@@ -88,6 +88,7 @@ PostSchema.statics.getRelatedPosts = async function (postId, limit = 5) {
       _id: { $ne: currentPost._id }, // Exclude the current post
       tags: { $in: currentPost.tags }, // Find posts with overlapping tags
     })
+      .populate("author")
       .limit(limit) // Limit the number of results
       .sort({ createdAt: -1 }); // Sort by most recent
 

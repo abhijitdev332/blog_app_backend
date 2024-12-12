@@ -11,12 +11,14 @@ import {
   createPost,
   getTrendingPost,
   getUserPosts,
+  getSearchPost,
 } from "../controllers/postController.js";
 import asyncWrapper from "../utils/asyncWrapper.js";
 import { verifyToken } from "../middleware/adminPermit.js";
 
 router.post("/create", verifyToken, asyncWrapper(createPost));
 router.get("/trending", asyncWrapper(getTrendingPost));
+router.get("/search", asyncWrapper(getSearchPost));
 router.get("/user/:userId", verifyToken, asyncWrapper(getUserPosts));
 router.get("/", asyncWrapper(getAllPublishPosts));
 router.get("/related/:id", asyncWrapper(getRelatedPost));

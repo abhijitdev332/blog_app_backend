@@ -65,6 +65,21 @@ const getUserPosts = async (req, res) => {
 
   res.status(200).json({ msg: "success", data: userPosts });
 };
+const getSearchPost = async (req, res) => {
+  const { search } = req.query;
+  if (!search) {
+    return res.status(400).json({ msg: "please provide search string" });
+  }
+  let posts = await postModal.find({
+    tags: { $regex: search, $options: "i" },
+  });
+  if (!posts.length) {
+    return res
+      .status(404)
+      .json({ msg: "No posts found matching the search criteria." });
+  }
+  res.status(200).json({ msg: "successfull", data: posts });
+};
 
 export {
   getPost,
@@ -76,4 +91,5 @@ export {
   createPost,
   getTrendingPost,
   getUserPosts,
+  getSearchPost,
 };
