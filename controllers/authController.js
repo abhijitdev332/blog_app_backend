@@ -17,7 +17,9 @@ export const login = async (req, res) => {
     // setcookie
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false,
+      secure: true,
+      sameSite: "none",
+      maxAge: 24 * 60 * 60 * 1000,
     });
     return res.status(200).json({ msg: "success", data: resUser });
   } else {
@@ -28,8 +30,8 @@ export const logout = async (req, res) => {
   res.clearCookie("token", {
     path: "/", // Path of the cookie
     httpOnly: true,
-    secure: false, // Use true in production
-    // sameSite: "None", // Adjust based on your requirements
+    secure: true, // Use true in production
+    sameSite: "None", // Adjust based on your requirements
   });
   res.status(200).json({ msg: "logout succesfull" });
   // session

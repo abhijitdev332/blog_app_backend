@@ -22,27 +22,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   helmet({
+    hidePoweredBy: true,
     xPoweredBy: false,
   })
 );
-// express session
-// app.use(
-//   session({
-//     secret: process.env.jwtSecret, // Replace with a secure key
-//     resave: false, // Avoid resaving session if unmodified
-//     saveUninitialized: true, // Save uninitialized sessions
-//     cookie: {
-//       secure: false, // Use true in production with HTTPS
-//       httpOnly: true,
-//       // sameSite: "None", // Ensure these match
-//       maxAge: 3600000, // 1 hour
-//     },
-//   })
-// );
 app.use(cookie());
 
-app.get("/", (req, res, next) => {
-  res.json("this is response");
+app.get("/", (req, res) => {
+  res.json("this is reponse from backend");
 });
 app.use("/user", userRoutes);
 app.use("/auth", authRoutes);

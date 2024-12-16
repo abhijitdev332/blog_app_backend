@@ -16,12 +16,9 @@ export const verifyToken = (req, res, next) => {
   // VERIFY TOKEN
   let secret = process.env.jwtSecret;
   let token = req.cookies.token;
-  // console.log(req.cookies);
-  // const session = req.session.token;
   if (token) {
     jwt.verify(token, secret, (err, data) => {
       if (err) {
-        console.log("err");
         return res.status(403).json({ message: "token is invalid" });
       } else {
         req.user = data;
