@@ -3,7 +3,6 @@ const app = express();
 import globalError from "./utils/globalErrorHandler.js";
 import dotenv from "dotenv";
 import cookie from "cookie-parser";
-import session from "express-session";
 import helmet from "helmet";
 import cors from "cors";
 // import
@@ -11,12 +10,12 @@ import userRoutes from "./routes/userRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import postRoutes from "./routes/postRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
-
+import { allowOrigins } from "./config/config.js";
 dotenv.config();
 app.use(
   cors({
     credentials: true,
-    origin: "http://localhost:3000",
+    origin: allowOrigins,
   })
 );
 app.use(express.json());
