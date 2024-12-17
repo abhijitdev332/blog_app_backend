@@ -87,6 +87,7 @@ PostSchema.statics.getRelatedPosts = async function (postId, limit = 5) {
     const relatedPosts = await this.find({
       _id: { $ne: currentPost._id }, // Exclude the current post
       tags: { $in: currentPost.tags }, // Find posts with overlapping tags
+      status: "published",
     })
       .populate("author")
       .limit(limit) // Limit the number of results

@@ -17,8 +17,8 @@ export const login = async (req, res) => {
     // setcookie
     res.cookie("token", token, {
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
+      secure: process.env.NODE_ENV == "production",
+      sameSite: process.env.NODE_ENV == "production" ? "none" : "",
     });
     return res.status(200).json({ msg: "success", data: resUser });
   } else {
@@ -29,8 +29,8 @@ export const logout = async (req, res) => {
   res.clearCookie("token", {
     path: "/", // Path of the cookie
     httpOnly: true,
-    secure: true, // Use true in production
-    sameSite: "none", // Adjust based on your requirements
+    secure: process.env.NODE_ENV == "production",
+    sameSite: process.env.NODE_ENV == "production" ? "none" : "",
   });
   res.status(200).json({ msg: "logout succesfull" });
   // session
