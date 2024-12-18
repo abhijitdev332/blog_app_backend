@@ -1,9 +1,31 @@
 import { postModal } from "../models/post.js";
+import { v2 as cloudinary } from "cloudinary";
 const createPost = async (req, res) => {
   const newPost = new postModal(req.body);
   const savedPost = await newPost.save();
 
   res.status(201).json({ msg: "success", data: savedPost });
+};
+const uploadImage = async (req, res) => {
+  // not file return it
+  if (!req.file) {
+    return res.status(400).json({ msg: "No file uploaded" });
+  }
+  // Convert buffer to data URI
+  const fileStr = `data:${req.file.mimetype};base64,${req.file.buffer.toString(
+    "base64"
+  )}`;
+
+  // Upload to Cloudinary
+  const uploadResponse = await cloudinary.uploader.upload(fileStr, {
+    folder: "my_uploads",
+    resource_type: "auto",
+    transformation: [{ quality: "auto" }, { fetch_format: "auto" }],
+  });
+  res.status(200).json({
+    msg: "Upload successful",
+    imageUrl: uploadResponse.secure_url,
+  });
 };
 const getPost = async (req, res) => {
   const { id } = req.params;
@@ -92,4 +114,5 @@ export {
   getTrendingPost,
   getUserPosts,
   getSearchPost,
+  uploadImage,
 };

@@ -12,11 +12,19 @@ import {
   getTrendingPost,
   getUserPosts,
   getSearchPost,
+  uploadImage,
 } from "../controllers/postController.js";
 import asyncWrapper from "../utils/asyncWrapper.js";
 import { verifyToken } from "../middleware/adminPermit.js";
+import { uploader } from "../middleware/uploadImage.js";
 
 router.post("/create", verifyToken, asyncWrapper(createPost));
+router.post(
+  "/upload",
+  verifyToken,
+  uploader.single("image"),
+  asyncWrapper(uploadImage)
+);
 router.get("/trending", asyncWrapper(getTrendingPost));
 router.get("/search", asyncWrapper(getSearchPost));
 router.get("/user/:userId", verifyToken, asyncWrapper(getUserPosts));

@@ -11,6 +11,7 @@ import authRoutes from "./routes/authRoutes.js";
 import postRoutes from "./routes/postRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import { allowOrigins } from "./config/config.js";
+import { configureCloudinary } from "./config/cloudinay.js";
 dotenv.config();
 app.use(
   cors({
@@ -26,7 +27,7 @@ app.use(
   })
 );
 app.use(cookie());
-
+configureCloudinary();
 app.get("/", (req, res) => {
   res.json("this is reponse from backend");
 });
