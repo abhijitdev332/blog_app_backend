@@ -92,9 +92,12 @@ const getSearchPost = async (req, res) => {
   if (!search) {
     return res.status(400).json({ msg: "please provide search string" });
   }
-  let posts = await postModal.find({
-    tags: { $regex: search, $options: "i" },
-  });
+  let posts = await postModal
+    .find({
+      tags: { $regex: search, $options: "i" },
+      status: "published",
+    })
+    .populate("author");
   if (!posts.length) {
     return res
       .status(404)
