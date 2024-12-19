@@ -21,6 +21,9 @@ export async function getUser(req, res) {
   const { id } = req.params;
 
   const matchedUser = await UserModal.findOne({ _id: id });
+  if (!matchedUser) {
+    return res.status(500).json({ msg: "server error" });
+  }
   res.status(200).json({
     msg: "success",
     data: matchedUser,
@@ -38,6 +41,9 @@ export async function updateUser(req, res) {
       runValidators: true,
     }
   );
+  if (!updatedUser) {
+    return res.status(500).json({ msg: "server error!!Failed to update user" });
+  }
 
   res.status(200).json({
     msg: "success",

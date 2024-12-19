@@ -4,8 +4,8 @@ import { UserModal } from "../models/user.js";
 const getAdminAllPosts = async (req, res) => {
   let posts = await postModal.find({}).populate("author");
 
-  if (!posts.length) {
-    return res.status(404).json({ msg: "No posts found for this user" });
+  if (posts?.length <= 0) {
+    return res.status(200).json({ msg: "No posts found for this user" });
   }
   res.status(200).json({ msg: "successfull", data: posts });
 };

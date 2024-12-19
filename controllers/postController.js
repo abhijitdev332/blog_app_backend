@@ -30,18 +30,27 @@ const uploadImage = async (req, res) => {
 const getPost = async (req, res) => {
   const { id } = req.params;
   const post = await postModal.findById(id).populate("author");
-  res.status(200).json({ msg: "success", data: post });
+  if (!post) {
+    return res.status(500).json({ msg: "failed to get the post!!" });
+  }
+  return res.status(200).json({ msg: "success", data: post });
 };
 const getAllPublishPosts = async (req, res) => {
   // const { limit = 5, skip = 0 } = req.params;
   let posts = await postModal.find({ status: "published" }).populate("author");
+  if (posts?.length <= 0) {
+    return res.status(200).json({ msg: "no posts found!!" });
+  }
   res.status(200).json({ msg: "success", data: posts });
 };
 const getRelatedPost = async (req, res) => {
   const { id } = req.params;
 
   const posts = await postModal.getRelatedPosts(id);
-  res.status(200).json({ msg: "success", data: posts });
+  if (posts?.length <= 0) {
+    return res.status(200).json({ msg: "no post found!!" });
+  }
+  return res.status(200).json({ msg: "success", data: posts });
 };
 const UpdatePost = async (req, res) => {
   const { id } = req.params;
@@ -52,6 +61,9 @@ const UpdatePost = async (req, res) => {
     { new: true, runValidators: true }
   );
   updatedPost.updatePublish();
+  if (!updatedPost) {
+    return res.status(500).json({ msg: "failed to update the post!!" });
+  }
   res.status(200).json({ msg: "success", data: updatedPost });
 };
 const addLike = async (req, res) => {
@@ -63,7 +75,10 @@ const addLike = async (req, res) => {
 const deletePost = async (req, res) => {
   const { id } = req.params;
 
-  const deletePost = await postModal.findByIdAndDelete(id);
+  const deletedPost = await postModal.findByIdAndDelete(id);
+  if (!deletedPost) {
+    return res.status(500).json({ msg: "failed to delete the post!!" });
+  }
   res.status(200).json({ msg: "sucess" });
 };
 const getTrendingPost = async (req, res) => {
@@ -72,6 +87,9 @@ const getTrendingPost = async (req, res) => {
     .populate("author")
     .sort({ createdAt: -1 })
     .limit(1);
+  if (!post) {
+    return res.status(500).json({ msg: "failed to load trending post" });
+  }
   res.status(200).json({ msg: "success", data: post });
 };
 const getUserPosts = async (req, res) => {
@@ -81,8 +99,8 @@ const getUserPosts = async (req, res) => {
     .populate("author")
     .sort({ createdAt: -1 });
 
-  if (!userPosts.length) {
-    return res.status(404).json({ msg: "No posts found for this user" });
+  if (userPosts.length <= 0) {
+    return res.status(200).json({ msg: "No posts found for this user" });
   }
 
   res.status(200).json({ msg: "success", data: userPosts });
@@ -98,9 +116,9 @@ const getSearchPost = async (req, res) => {
       status: "published",
     })
     .populate("author");
-  if (!posts.length) {
+  if (posts.length <= 0) {
     return res
-      .status(404)
+      .status(200)
       .json({ msg: "No posts found matching the search criteria." });
   }
   res.status(200).json({ msg: "successfull", data: posts });
