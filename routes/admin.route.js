@@ -7,7 +7,7 @@ import {
   getAllUsers,
   updateUser,
   UpdatePostStatus,
-} from "../controllers/adminController.js";
+} from "../controllers/admin.controller.js";
 
 router.get("/posts", adminPermit, asyncWrapper(getAdminAllPosts));
 router.get("/user", adminPermit, asyncWrapper(getAllUsers));

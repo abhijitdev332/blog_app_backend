@@ -1,28 +1,36 @@
-import { UserModal } from "../models/user.js";
-import jwt from "jsonwebtoken";
-export const login = async (req, res) => {
+import { UserModal } from "../models/user.model.js";
+import { createToken } from "../lib/createToken.js";
+import { ServerError } from "../lib/customError.js";
+import { decrypt } from "../lib/encryptPass.js";
+export const login = async (req, res, next) => {
   const { email, password } = req.body;
   // check the mail its match with any
   let user = await UserModal.findOne({ email: email });
   if (!user) {
-    return res.status(402).json({ msg: "Please enter correct mail" });
+    let userErr = new ServerError("Not found any user on this mail");
+    return next(userErr);
   }
-  if (user?.password == password) {
-    let secret = process.env.jwtSecret;
-    let resUser = { ...user._doc };
-    // delete password key
-    delete resUser?.password;
-    // assign cookie
-    const token = jwt.sign({ ...resUser }, secret);
-    // setcookie
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV == "production",
-      sameSite: process.env.NODE_ENV == "production" ? "none" : "",
-    });
-    return res.status(200).json({ msg: "success", data: resUser });
-  } else {
-    return res.json({ msg: "password don't match" });
+
+  try {
+    if (decrypt(password, user?.password)) {
+      // let secret = process.env.jwtSecret;
+      // let resUser = { ...user._doc };
+      // delete password key
+      // delete resUser?.password;
+      // assign cookie
+      // const token = jwt.sign({ ...resUser }, secret);
+      const token = createToken(user);
+      // setcookie
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV == "production",
+        sameSite: process.env.NODE_ENV == "production" ? "none" : "",
+      });
+      return res.status(200).json({ msg: "Login Successfull", data: resUser });
+    }
+  } catch (err) {
+    let passErr = new ServerError("Password don't matched");
+    return next(passErr);
   }
 };
 export const logout = async (req, res) => {

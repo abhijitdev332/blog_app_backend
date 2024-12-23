@@ -13,7 +13,7 @@ import {
   getUserPosts,
   getSearchPost,
   uploadImage,
-} from "../controllers/postController.js";
+} from "../controllers/post.controller.js";
 import asyncWrapper from "../utils/asyncWrapper.js";
 import { verifyToken } from "../middleware/adminPermit.js";
 import { uploader } from "../middleware/uploadImage.js";

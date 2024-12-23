@@ -3,7 +3,7 @@ const router = express.Router();
 
 // IMPORT CONTROLLERS
 import asyncWrapper from "../utils/asyncWrapper.js";
-import { login, logout } from "../controllers/authController.js";
+import { login, logout } from "../controllers/auth.controller.js";
 import { verifyToken } from "../middleware/adminPermit.js";
 
 router.post("/login", asyncWrapper(login));

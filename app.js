@@ -6,10 +6,10 @@ import cookie from "cookie-parser";
 import helmet from "helmet";
 import cors from "cors";
 // import
-import userRoutes from "./routes/userRoutes.js";
-import authRoutes from "./routes/authRoutes.js";
-import postRoutes from "./routes/postRoutes.js";
-import adminRoutes from "./routes/adminRoutes.js";
+import userRoutes from "./routes/user.route.js";
+import authRoutes from "./routes/auth.route.js";
+import postRoutes from "./routes/post.route.js";
+import adminRoutes from "./routes/admin.route.js";
 import { allowOrigins } from "./config/config.js";
 import { configureCloudinary } from "./config/cloudinay.js";
 dotenv.config();

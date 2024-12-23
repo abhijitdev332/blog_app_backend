@@ -9,7 +9,7 @@ import {
   deleteUser,
   getUser,
   updateUser,
-} from "../controllers/userController.js";
+} from "../controllers/user.controller.js";
 
 router.post("/create", asyncWrapper(createUser));
 router.get("/:id", verifyToken, asyncWrapper(getUser));

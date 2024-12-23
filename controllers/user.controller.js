@@ -1,19 +1,23 @@
-import { UserModal } from "../models/user.js";
-export async function createUser(req, res) {
+import { UserModal } from "../models/user.model.js";
+import { ServerError } from "../lib/customError.js";
+import { encrypt } from "../lib/encryptPass.js";
+export async function createUser(req, res, next) {
   const { username, email, password } = req.body;
+  let dcryptPass = await encrypt(password);
   const user = new UserModal({
     username,
     email,
-    password,
+    password: dcryptPass,
   });
   let savedUser = await user.save();
   if (!savedUser) {
-    return res.status(500).json({ msg: "something went wrong" });
+    let userErr = new ServerError();
+    return next(userErr);
   }
   let resUser = { ...savedUser._doc };
   delete resUser?.password;
   res.status(201).json({
-    msg: "success",
+    msg: "User Created Successfully",
     data: resUser,
   });
 }

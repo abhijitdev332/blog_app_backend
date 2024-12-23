@@ -1,15 +1,20 @@
-import { postModal } from "../models/post.js";
+import { postModal } from "../models/post.model.js";
+import { ServerError } from "../lib/customError.js";
 import { v2 as cloudinary } from "cloudinary";
-const createPost = async (req, res) => {
+const createPost = async (req, res, next) => {
   const newPost = new postModal(req.body);
   const savedPost = await newPost.save();
-
-  res.status(201).json({ msg: "success", data: savedPost });
+  if (!savedPost) {
+    let postErr = new ServerError();
+    return next(postErr);
+  }
+  res.status(201).json({ msg: "Post Created Successfull", data: savedPost });
 };
-const uploadImage = async (req, res) => {
+const uploadImage = async (req, res, next) => {
   // not file return it
   if (!req.file) {
-    return res.status(400).json({ msg: "No file uploaded" });
+    let fileErr = new ServerError("Failed to upload file");
+    return next(fileErr);
   }
   // Convert buffer to data URI
   const fileStr = `data:${req.file.mimetype};base64,${req.file.buffer.toString(
@@ -17,23 +22,29 @@ const uploadImage = async (req, res) => {
   )}`;
 
   // Upload to Cloudinary
-  const uploadResponse = await cloudinary.uploader.upload(fileStr, {
-    folder: "my_uploads",
-    resource_type: "auto",
-    transformation: [{ quality: "auto" }, { fetch_format: "auto" }],
-  });
-  res.status(200).json({
-    msg: "Upload successful",
-    imageUrl: uploadResponse.secure_url,
-  });
+  try {
+    const uploadResponse = await cloudinary.uploader.upload(fileStr, {
+      folder: "my_uploads",
+      resource_type: "auto",
+      transformation: [{ quality: "auto" }, { fetch_format: "auto" }],
+    });
+    res.status(200).json({
+      msg: "Upload successful",
+      imageUrl: uploadResponse.secure_url,
+    });
+  } catch (err) {
+    let uploadErr = new ServerError("Failed to upload image in clodinary");
+    next(uploadErr);
+  }
 };
-const getPost = async (req, res) => {
+const getPost = async (req, res, next) => {
   const { id } = req.params;
   const post = await postModal.findById(id).populate("author");
   if (!post) {
-    return res.status(500).json({ msg: "failed to get the post!!" });
+    let postErr = new ServerError("Failed to get post!!");
+    return next(postErr);
   }
-  return res.status(200).json({ msg: "success", data: post });
+  return res.status(200).json({ msg: "Post fetch successfull", data: post });
 };
 const getAllPublishPosts = async (req, res) => {
   // const { limit = 5, skip = 0 } = req.params;
