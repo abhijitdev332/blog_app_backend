@@ -48,7 +48,11 @@ const getPost = async (req, res, next) => {
 };
 const getAllPublishPosts = async (req, res) => {
   // const { limit = 5, skip = 0 } = req.params;
-  let posts = await postModal.find({ status: "published" }).populate("author");
+  let posts = await postModal
+    .find({ status: "published" })
+    .skip(1)
+    .sort({ createdAt: -1 })
+    .populate("author");
   if (posts?.length <= 0) {
     return res.status(200).json({ msg: "no posts found!!" });
   }
