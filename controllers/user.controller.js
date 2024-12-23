@@ -4,7 +4,7 @@ import { encrypt } from "../lib/encryptPass.js";
 export async function createUser(req, res, next) {
   const { username, email, password } = req.body;
   const haveUser = await UserModal.find({ email: email });
-  if (haveUser) {
+  if (haveUser.length > 0) {
     let userErr = new appError("Email already in use!!");
     return next(userErr);
   }
