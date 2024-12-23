@@ -1,13 +1,18 @@
 import { UserModal } from "../models/user.model.js";
-import { ServerError } from "../lib/customError.js";
+import { appError, ServerError } from "../lib/customError.js";
 import { encrypt } from "../lib/encryptPass.js";
 export async function createUser(req, res, next) {
   const { username, email, password } = req.body;
-  let dcryptPass = await encrypt(password);
+  const haveUser = await UserModal.find({ email: email });
+  if (haveUser) {
+    let userErr = new appError("Email already in use!!");
+    return next(userErr);
+  }
+  let encryptPass = await encrypt(password);
   const user = new UserModal({
     username,
     email,
-    password: dcryptPass,
+    password: encryptPass,
   });
   let savedUser = await user.save();
   if (!savedUser) {
@@ -16,7 +21,7 @@ export async function createUser(req, res, next) {
   }
   let resUser = { ...savedUser._doc };
   delete resUser?.password;
-  res.status(201).json({
+  return res.status(201).json({
     msg: "User Created Successfully",
     data: resUser,
   });

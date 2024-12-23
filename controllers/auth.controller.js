@@ -12,25 +12,28 @@ export const login = async (req, res, next) => {
   }
 
   try {
-    if (decrypt(password, user?.password)) {
-      // let secret = process.env.jwtSecret;
-      // let resUser = { ...user._doc };
-      // delete password key
-      // delete resUser?.password;
-      // assign cookie
-      // const token = jwt.sign({ ...resUser }, secret);
-      const token = createToken(user);
-      // setcookie
-      res.cookie("token", token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV == "production",
-        sameSite: process.env.NODE_ENV == "production" ? "none" : "",
-      });
-      return res.status(200).json({ msg: "Login Successfull", data: resUser });
+    let passCheck = await decrypt(password, user?.password);
+    if (!passCheck) {
+      let passErr = new ServerError("Password don't matched");
+      return next(passErr);
     }
+    // let secret = process.env.jwtSecret;
+    let resUser = { ...user._doc };
+    // delete password key
+    delete resUser?.password;
+    // assign cookie
+    // const token = jwt.sign({ ...resUser }, secret);
+    const token = createToken(user);
+    // setcookie
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV == "production",
+      sameSite: process.env.NODE_ENV == "production" ? "none" : "",
+    });
+    res.status(200).json({ msg: "Login Successfull", data: resUser });
   } catch (err) {
-    let passErr = new ServerError("Password don't matched");
-    return next(passErr);
+    let passErr = new ServerError();
+    next(passErr);
   }
 };
 export const logout = async (req, res) => {

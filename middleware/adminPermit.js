@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import { UnauthError } from "../lib/customError.js";
 
 export const adminPermit = (req, res, next) => {
   // verify the jwt token
@@ -6,7 +7,8 @@ export const adminPermit = (req, res, next) => {
     if (req?.user?.roles?.includes("admin")) {
       return next();
     } else {
-      return res.status(401).json({ msg: "you are not authenticated " });
+      let authErr = new UnauthError();
+      return next(authErr);
     }
   });
   // then verify its admin
@@ -19,14 +21,16 @@ export const verifyToken = (req, res, next) => {
   if (token) {
     jwt.verify(token, secret, (err, data) => {
       if (err) {
-        return res.status(403).json({ message: "token is invalid" });
+        let authErr = new UnauthError("Token is invalid");
+        return next(authErr);
       } else {
         req.user = data;
         return next();
       }
     });
   } else {
-    return res.status(401).json({ message: "you are not authticated" });
+    let authErr = new UnauthError("You are not authenticated!!");
+    return next(authErr);
   }
 
   // your are not autheitceted
