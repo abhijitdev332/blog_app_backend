@@ -12,7 +12,7 @@ import {
 } from "../controllers/user.controller.js";
 
 router.post("/create", asyncWrapper(createUser));
-router.get("/:id", verifyToken, asyncWrapper(getUser));
+router.get("/:id", asyncWrapper(getUser));
 router.put("/:id", verifyToken, asyncWrapper(updateUser));
 router.delete("/:id", verifyToken, asyncWrapper(deleteUser));
 

@@ -31,14 +31,17 @@ export async function getUser(req, res) {
 
   const matchedUser = await UserModal.findOne({ _id: id });
   if (!matchedUser) {
-    return res.status(500).json({ msg: "server error" });
+    let userErr = new appError("can't find any user");
+    return next(userErr);
   }
-  res.status(200).json({
-    msg: "success",
-    data: matchedUser,
+  let resUser = { ...matchedUser._doc };
+  delete resUser?.password;
+  return res.status(200).json({
+    msg: "successfull",
+    data: resUser,
   });
 }
-export async function updateUser(req, res) {
+export async function updateUser(req, res, next) {
   const { id } = req.params;
   const { username, email, password } = req.body;
 
@@ -51,11 +54,12 @@ export async function updateUser(req, res) {
     }
   );
   if (!updatedUser) {
-    return res.status(500).json({ msg: "server error!!Failed to update user" });
+    let serverErr = new ServerError("Failed to update user");
+    return next(serverErr);
   }
 
   res.status(200).json({
-    msg: "success",
+    msg: "User updated Successfully",
     data: updatedUser,
   });
 }
@@ -64,9 +68,10 @@ export async function deleteUser(req, res) {
 
   const deletedUser = await UserModal.findByIdAndDelete(id);
   if (!deletedUser) {
-    return res.status(500).json({ msg: "something went wrong please retry" });
+    let serverErr = new ServerError("failed to delete user!!");
+    return next(serverErr);
   }
   res.status(200).json({
-    msg: "success",
+    msg: "user deleted successfully",
   });
 }
