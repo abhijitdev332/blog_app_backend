@@ -47,15 +47,17 @@ const getPost = async (req, res, next) => {
   return res.status(200).json({ msg: "Post fetch successfull", data: post });
 };
 const getAllPublishPosts = async (req, res) => {
-  // const { limit = 5, skip = 0 } = req.params;
+  const { limit = 5, skip = 1 } = req.query;
   let posts = await postModal
     .find({ status: "published" })
-    .skip(1)
+    .limit(limit)
+    .skip(skip)
     .sort({ createdAt: -1 })
     .populate("author");
   if (posts?.length <= 0) {
     return res.status(200).json({ msg: "no posts found!!" });
   }
+
   res.status(200).json({ msg: "success", data: posts });
 };
 const getRelatedPost = async (req, res) => {
