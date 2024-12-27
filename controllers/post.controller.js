@@ -89,12 +89,13 @@ const addLike = async (req, res) => {
   findPost.addLike();
   res.status(200).json({ msg: "success", data: findPost });
 };
-const deletePost = async (req, res) => {
+const deletePost = async (req, res, next) => {
   const { id } = req.params;
 
   const deletedPost = await postModal.findByIdAndDelete(id);
   if (!deletedPost) {
-    return res.status(500).json({ msg: "failed to delete the post!!" });
+    let postErr = new ServerError("Failed to delete Post!!");
+    return next(postErr);
   }
   res.status(200).json({ msg: "sucess" });
 };
@@ -111,8 +112,11 @@ const getTrendingPost = async (req, res) => {
 };
 const getUserPosts = async (req, res) => {
   const { userId } = req.params;
+  const { limit = 0, skip = 0 } = req.query;
   let userPosts = await postModal
     .find({ author: userId })
+    .limit(limit)
+    .skip(skip)
     .populate("author")
     .sort({ createdAt: -1 });
 
