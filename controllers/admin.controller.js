@@ -30,7 +30,6 @@ const UpdatePostStatus = async (req, res, next) => {
   updatedPost.updatePublish();
   res.status(200).json({ msg: "Post Updated Successfull", data: updatedPost });
 };
-
 const getAllUsers = async (req, res, next) => {
   const { limit = 0, skip = 0 } = req.query;
   let allUser = await UserModal.find({})

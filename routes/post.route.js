@@ -13,6 +13,7 @@ import {
   getUserPosts,
   getSearchPost,
   uploadImage,
+  addComment,
 } from "../controllers/post.controller.js";
 import asyncWrapper from "../utils/asyncWrapper.js";
 import { verifyToken } from "../middleware/adminPermit.js";
@@ -31,6 +32,7 @@ router.get("/user/:userId", verifyToken, asyncWrapper(getUserPosts));
 router.get("/", asyncWrapper(getAllPublishPosts));
 router.get("/related/:id", asyncWrapper(getRelatedPost));
 router.get("/:id", asyncWrapper(getPost));
+router.put("/comment/:id", verifyToken, asyncWrapper(addComment));
 router.put("/:id", verifyToken, asyncWrapper(UpdatePost));
 router.delete("/:id", verifyToken, asyncWrapper(deletePost));
 

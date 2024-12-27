@@ -39,7 +39,10 @@ const uploadImage = async (req, res, next) => {
 };
 const getPost = async (req, res, next) => {
   const { id } = req.params;
-  const post = await postModal.findById(id).populate("author");
+  const post = await postModal
+    .findById(id, "-comments.user.password")
+    .populate("comments.user", "-password -roles")
+    .populate("author");
   if (!post) {
     let postErr = new ServerError("Failed to get post!!");
     return next(postErr);
@@ -144,6 +147,17 @@ const getSearchPost = async (req, res) => {
   }
   res.status(200).json({ msg: "successfull", data: posts });
 };
+const addComment = async (req, res, next) => {
+  const { id } = req.params;
+  let getedPost = await postModal.findById(id);
+  if (!getedPost) {
+    let postErr = new ServerError("Post Not Found!!");
+    return next(postErr);
+  }
+  getedPost.comments.push(req.body?.comments);
+  await getedPost.save();
+  res.status(200).json({ msg: "Comment Added Successfully", data: getedPost });
+};
 
 export {
   getPost,
@@ -157,4 +171,5 @@ export {
   getUserPosts,
   getSearchPost,
   uploadImage,
+  addComment,
 };
