@@ -2,15 +2,15 @@ import { UserModal } from "../models/user.model.js";
 import { createToken } from "../lib/createToken.js";
 import { ServerError, AppError } from "../lib/customError.js";
 import { decrypt } from "../lib/encryptPass.js";
-import { logMessage, infoLogger } from "../utils/logger.js";
+import { logMessage, errorLogger } from "../utils/logger.js";
 export const login = async (req, res, next) => {
   const { email, password } = req.body;
   // check the mail its match with any
   let user = await UserModal.findOne({ email: email });
   if (!user) {
-    logMessage(infoLogger, "No user found on this Email", { email });
-    return res.status(200).json({
-      msg: "No found any user on this Email",
+    logMessage(errorLogger, "No user found on this Email", { email });
+    return res.status(404).json({
+      msg: "Not found any user on this Email",
     });
   }
 
