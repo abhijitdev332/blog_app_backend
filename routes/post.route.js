@@ -14,6 +14,7 @@ import {
   getSearchPost,
   uploadImage,
   addComment,
+  deleteComment,
 } from "../controllers/post.controller.js";
 import asyncWrapper from "../utils/asyncWrapper.js";
 import { verifyToken } from "../middleware/verifyToken.js";
@@ -34,6 +35,7 @@ router.get("/related/:id", asyncWrapper(getRelatedPost));
 router.get("/:id", asyncWrapper(getPost));
 router.put("/comment/:id", verifyToken, asyncWrapper(addComment));
 router.put("/:id", verifyToken, asyncWrapper(UpdatePost));
+router.delete("/comment/:id", verifyToken, asyncWrapper(deleteComment));
 router.delete("/:id", verifyToken, asyncWrapper(deletePost));
 
 export default router;

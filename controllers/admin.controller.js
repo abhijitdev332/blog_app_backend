@@ -5,7 +5,7 @@ import { DatabaseError, ServerError } from "../lib/customError.js";
 const getAdminAllPosts = async (req, res, next) => {
   const { limit = 0, skip = 0 } = req.query;
   let posts = await postModal
-    .find({}, { likes: -1, comments: -1 })
+    .find({}, { likes: 0, comments: 0 })
     .limit(limit)
     .skip(skip)
     .sort({ createdAt: -1 })

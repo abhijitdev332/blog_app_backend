@@ -159,6 +159,38 @@ const addComment = async (req, res, next) => {
   await getedPost.save();
   res.status(200).json({ msg: "Comment Added Successfully", data: getedPost });
 };
+const deleteComment = async (req, res, next) => {
+  try {
+    const { id: commentId } = req.params; // Comment ID
+    const { postId } = req.query; // Post ID
+
+    // Find the post
+    const getPost = await postModal.findById(postId);
+    if (!getPost) {
+      return next(new DatabaseError("Post Not Found!!"));
+    }
+
+    // Find and remove the comment by ID
+    const commentIndex = getPost.comments.findIndex(
+      (comment) => comment._id.toString() === commentId
+    );
+
+    if (commentIndex === -1) {
+      return next(new DatabaseError("Comment Not Found!!"));
+    }
+
+    // Remove the comment from the array
+    getPost.comments.splice(commentIndex, 1);
+
+    // Save the updated post
+    await getPost.save();
+
+    // Respond with success
+    res.status(200).json({ msg: "Comment deleted successfully!" });
+  } catch (error) {
+    next(new ServerError("Failed to delete this comment!!"));
+  }
+};
 
 export {
   getPost,
@@ -173,4 +205,5 @@ export {
   getSearchPost,
   uploadImage,
   addComment,
+  deleteComment,
 };

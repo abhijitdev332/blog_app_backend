@@ -1,5 +1,21 @@
 import mongoose from "mongoose";
 
+const CommentSchema = new mongoose.Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "user",
+    required: true,
+  },
+  text: {
+    type: String,
+    required: [true, "Comment text is required"],
+    minlength: [3, "Comment text must not be empty"],
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
 const PostSchema = new mongoose.Schema(
   {
     title: {
@@ -46,24 +62,7 @@ const PostSchema = new mongoose.Schema(
       default: 0,
       min: [0, "Likes cannot be negative"],
     },
-    comments: [
-      {
-        user: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "user",
-          required: true,
-        },
-        text: {
-          type: String,
-          required: [true, "Comment text is required"],
-          minlength: [3, "Comment text must not be empty"],
-        },
-        createdAt: {
-          type: Date,
-          default: Date.now,
-        },
-      },
-    ],
+    comments: [CommentSchema],
   },
   { timestamps: true }
 );
