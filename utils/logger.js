@@ -5,9 +5,8 @@ const { timestamp, json, combine, colorize, printf } = winston.format;
 const isProd = process.env.NODE_ENV === "production";
 // Custom console format for better readability
 const consoleFormat = printf(({ level, message, timestamp, ...metadata }) => {
-  return `${timestamp} ${level}: ${message} ${
-    Object.keys(metadata).length ? JSON.stringify(metadata) : ""
-  }`;
+  const meta = Object.keys(metadata).length ? JSON.stringify(metadata) : "";
+  return `${timestamp} ${level}: ${message} ${meta}`;
 });
 
 // Create transport based on environment
@@ -67,7 +66,7 @@ const logMessage = (logger, message, metadata = {}) => {
     level: logger.level,
     message,
     environment,
-    ...metadata,
+    metadata,
   });
 };
 

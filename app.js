@@ -1,6 +1,6 @@
 import express from "express";
 const app = express();
-import globalError from "./utils/globalErrorHandler.js";
+import { globalErrorHandler } from "./utils/globalErrorHandler.js";
 import dotenv from "dotenv";
 import cookie from "cookie-parser";
 import helmet from "helmet";
@@ -12,6 +12,7 @@ import postRoutes from "./routes/post.route.js";
 import adminRoutes from "./routes/admin.route.js";
 import { allowOrigins } from "./config/config.js";
 import { configureCloudinary } from "./config/cloudinay.js";
+import { AppError } from "./lib/customError.js";
 dotenv.config();
 app.use(
   cors({
@@ -35,7 +36,11 @@ app.use("/user", userRoutes);
 app.use("/auth", authRoutes);
 app.use("/post", postRoutes);
 app.use("/admin", adminRoutes);
+app.use("*", async (req, res, next) => {
+  let noRouteErr = new AppError("No route match with this path", 400);
+  next(noRouteErr);
+});
 
-app.use("*", globalError);
+app.use(globalErrorHandler);
 
 export default app;

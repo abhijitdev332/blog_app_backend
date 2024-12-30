@@ -1,11 +1,11 @@
 import { postModal } from "../models/post.model.js";
-import { ServerError } from "../lib/customError.js";
+import { DatabaseError, ServerError } from "../lib/customError.js";
 import { v2 as cloudinary } from "cloudinary";
 const createPost = async (req, res, next) => {
   const newPost = new postModal(req.body);
   const savedPost = await newPost.save();
   if (!savedPost) {
-    let postErr = new ServerError();
+    let postErr = new DatabaseError("Failed to save the post!!");
     return next(postErr);
   }
   res.status(201).json({ msg: "Post Created Successfull", data: savedPost });
@@ -13,7 +13,7 @@ const createPost = async (req, res, next) => {
 const uploadImage = async (req, res, next) => {
   // not file return it
   if (!req.file) {
-    let fileErr = new ServerError("Failed to upload file");
+    let fileErr = new ServerError("Failed to upload file!!");
     return next(fileErr);
   }
   // Convert buffer to data URI
@@ -33,7 +33,7 @@ const uploadImage = async (req, res, next) => {
       imageUrl: uploadResponse.secure_url,
     });
   } catch (err) {
-    let uploadErr = new ServerError("Failed to upload image in clodinary");
+    let uploadErr = new ServerError("Failed to upload image in Database!!");
     next(uploadErr);
   }
 };
@@ -44,12 +44,12 @@ const getPost = async (req, res, next) => {
     .populate("comments.user", "-password -roles")
     .populate("author");
   if (!post) {
-    let postErr = new ServerError("Failed to get post!!");
+    let postErr = new DatabaseError("Failed to get post!!");
     return next(postErr);
   }
   return res.status(200).json({ msg: "Post fetch successfull", data: post });
 };
-const getAllPublishPosts = async (req, res) => {
+const getAllPublishPosts = async (req, res, next) => {
   const { limit = 5, skip = 1 } = req.query;
   let posts = await postModal
     .find({ status: "published" })
@@ -60,29 +60,29 @@ const getAllPublishPosts = async (req, res) => {
   if (posts?.length <= 0) {
     return res.status(200).json({ msg: "no posts found!!" });
   }
-
   res.status(200).json({ msg: "success", data: posts });
 };
-const getRelatedPost = async (req, res) => {
+const getRelatedPost = async (req, res, next) => {
   const { id } = req.params;
 
   const posts = await postModal.getRelatedPosts(id);
   if (posts?.length <= 0) {
-    return res.status(200).json({ msg: "no post found!!" });
+    return res.status(200).json({ msg: "No Related post found!!" });
   }
   return res.status(200).json({ msg: "success", data: posts });
 };
-const UpdatePost = async (req, res) => {
+const UpdatePost = async (req, res, next) => {
   const { id } = req.params;
 
   let updatedPost = await postModal.findByIdAndUpdate(
     id,
     { ...req.body },
-    { new: true, runValidators: true }
+    { runValidators: true }
   );
   updatedPost.updatePublish();
   if (!updatedPost) {
-    return res.status(500).json({ msg: "failed to update the post!!" });
+    let updateErr = new DatabaseError("Failed to update post!!");
+    return next(updateErr);
   }
   res.status(200).json({ msg: "success", data: updatedPost });
 };
@@ -97,23 +97,24 @@ const deletePost = async (req, res, next) => {
 
   const deletedPost = await postModal.findByIdAndDelete(id);
   if (!deletedPost) {
-    let postErr = new ServerError("Failed to delete Post!!");
+    let postErr = new DatabaseError("Failed to delete Post!!");
     return next(postErr);
   }
   res.status(200).json({ msg: "sucess" });
 };
-const getTrendingPost = async (req, res) => {
+const getTrendingPost = async (req, res, next) => {
   const post = await postModal
     .find({ status: "published" })
     .populate("author")
     .sort({ createdAt: -1 })
     .limit(1);
   if (!post) {
-    return res.status(500).json({ msg: "failed to load trending post" });
+    let postErr = new DatabaseError("Failed to get trending post!!");
+    next(postErr);
   }
   res.status(200).json({ msg: "success", data: post });
 };
-const getUserPosts = async (req, res) => {
+const getUserPosts = async (req, res, next) => {
   const { userId } = req.params;
   const { limit = 0, skip = 0 } = req.query;
   let userPosts = await postModal
@@ -129,7 +130,7 @@ const getUserPosts = async (req, res) => {
 
   res.status(200).json({ msg: "success", data: userPosts });
 };
-const getSearchPost = async (req, res) => {
+const getSearchPost = async (req, res, next) => {
   const { search } = req.query;
   if (!search) {
     return res.status(400).json({ msg: "please provide search string" });
@@ -151,7 +152,7 @@ const addComment = async (req, res, next) => {
   const { id } = req.params;
   let getedPost = await postModal.findById(id);
   if (!getedPost) {
-    let postErr = new ServerError("Post Not Found!!");
+    let postErr = new DatabaseError("Post Not Found!!");
     return next(postErr);
   }
   getedPost.comments.push(req.body?.comments);

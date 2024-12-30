@@ -1,11 +1,11 @@
 import { postModal } from "../models/post.model.js";
 import { UserModal } from "../models/user.model.js";
-import { ServerError } from "../lib/customError.js";
+import { DatabaseError, ServerError } from "../lib/customError.js";
 
-const getAdminAllPosts = async (req, res) => {
+const getAdminAllPosts = async (req, res, next) => {
   const { limit = 0, skip = 0 } = req.query;
   let posts = await postModal
-    .find({})
+    .find({}, { likes: -1, comments: -1 })
     .limit(limit)
     .skip(skip)
     .sort({ createdAt: -1 })
@@ -24,7 +24,7 @@ const UpdatePostStatus = async (req, res, next) => {
     { new: true, runValidators: true }
   );
   if (!updatedPost) {
-    let postErr = new ServerError();
+    let postErr = new DatabaseError("Failed to update the post", 500);
     return next(postErr);
   }
   updatedPost.updatePublish();
@@ -37,7 +37,7 @@ const getAllUsers = async (req, res, next) => {
     .skip(skip)
     .sort({ createdAt: -1 });
   if (!allUser) {
-    let userErr = new ServerError();
+    let userErr = new DatabaseError("Failed to get the users", 500);
     return next(userErr);
   }
   res.status(200).json({ msg: "successfull", data: allUser });
@@ -57,7 +57,7 @@ const updateUser = async (req, res, next) => {
     }
   );
   if (!updatedUser) {
-    let userErr = new ServerError();
+    let userErr = new DatabaseError("Failed to update user");
     return next(userErr);
   }
   res.status(200).json({ msg: "User Updated successfull" });

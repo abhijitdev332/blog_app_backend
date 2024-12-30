@@ -1,11 +1,11 @@
 import { UserModal } from "../models/user.model.js";
-import { appError, ServerError } from "../lib/customError.js";
+import { AppError, DatabaseError, ServerError } from "../lib/customError.js";
 import { encrypt } from "../lib/encryptPass.js";
 export async function createUser(req, res, next) {
   const { username, email, password } = req.body;
   const haveUser = await UserModal.find({ email: email });
   if (haveUser.length > 0) {
-    let userErr = new appError("Email already in use!!");
+    let userErr = new AppError("Email already in use!!", 400);
     return next(userErr);
   }
   let encryptPass = await encrypt(password);
@@ -16,7 +16,7 @@ export async function createUser(req, res, next) {
   });
   let savedUser = await user.save();
   if (!savedUser) {
-    let userErr = new ServerError();
+    let userErr = new DatabaseError("Failed to create user!!");
     return next(userErr);
   }
   let resUser = { ...savedUser._doc };
@@ -26,19 +26,18 @@ export async function createUser(req, res, next) {
     data: resUser,
   });
 }
-export async function getUser(req, res) {
+export async function getUser(req, res, next) {
   const { id } = req.params;
 
-  const matchedUser = await UserModal.findOne({ _id: id });
+  const matchedUser = await UserModal.findOne({ _id: id }, { password: -1 });
   if (!matchedUser) {
-    let userErr = new appError("can't find any user");
+    let userErr = new AppError("can't find any user", 400);
     return next(userErr);
   }
-  let resUser = { ...matchedUser._doc };
-  delete resUser?.password;
+
   return res.status(200).json({
     msg: "successfull",
-    data: resUser,
+    data: matchedUser,
   });
 }
 export async function updateUser(req, res, next) {
@@ -49,12 +48,11 @@ export async function updateUser(req, res, next) {
     id,
     { username, email, password },
     {
-      new: true,
       runValidators: true,
     }
   );
   if (!updatedUser) {
-    let serverErr = new ServerError("Failed to update user");
+    let serverErr = new DatabaseError("Failed to update user!!");
     return next(serverErr);
   }
 
@@ -63,12 +61,12 @@ export async function updateUser(req, res, next) {
     data: updatedUser,
   });
 }
-export async function deleteUser(req, res) {
+export async function deleteUser(req, res, next) {
   const { id } = req.params;
 
   const deletedUser = await UserModal.findByIdAndDelete(id);
   if (!deletedUser) {
-    let serverErr = new ServerError("failed to delete user!!");
+    let serverErr = new DatabaseError("failed to delete user!!");
     return next(serverErr);
   }
   res.status(200).json({

@@ -1,28 +1,32 @@
 import { UserModal } from "../models/user.model.js";
 import { createToken } from "../lib/createToken.js";
-import { ServerError } from "../lib/customError.js";
+import { ServerError, AppError } from "../lib/customError.js";
 import { decrypt } from "../lib/encryptPass.js";
+import { logMessage, infoLogger } from "../utils/logger.js";
 export const login = async (req, res, next) => {
   const { email, password } = req.body;
   // check the mail its match with any
   let user = await UserModal.findOne({ email: email });
   if (!user) {
-    let userErr = new ServerError("Not found any user on this mail");
-    return next(userErr);
+    res.status(200).json({
+      msg: "No found any user on this Email",
+    });
+    logMessage(infoLogger, "No user found on this Email", { email });
   }
 
   try {
     let passCheck = await decrypt(password, user?.password);
     if (!passCheck) {
-      let passErr = new ServerError("Password don't matched");
-      return next(passErr);
+      let passErr = new AppError("Password don't matched", 400);
+      return res.status(passErr.statusCode).json({
+        msg: passErr.msg,
+      });
     }
     // let secret = process.env.jwtSecret;
     let resUser = { ...user._doc };
     // delete password key
     delete resUser?.password;
     // assign cookie
-    // const token = jwt.sign({ ...resUser }, secret);
     const token = createToken(user);
     // setcookie
     res.cookie("token", token, {
@@ -32,37 +36,21 @@ export const login = async (req, res, next) => {
     });
     res.status(200).json({ msg: "Login Successfull", data: resUser });
   } catch (err) {
-    let passErr = new ServerError();
+    let passErr = new ServerError("Failed to login!!", 500);
     next(passErr);
   }
 };
-export const logout = async (req, res) => {
-  res.clearCookie("token", {
-    path: "/", // Path of the cookie
-    httpOnly: true,
-    secure: process.env.NODE_ENV == "production",
-    sameSite: process.env.NODE_ENV == "production" ? "none" : "",
-  });
-  res.status(200).json({ msg: "logout succesfull" });
-  // session
-  // req.session.destroy((err) => {
-  //   if (err) {
-  //     console.error("Error destroying session:", err);
-  //     return res.status(500).json({ msg: "Failed to log out" });
-  //   }
-
-  //   // Log for debugging purposes
-  //   console.log("Session destroyed");
-
-  //   // Clear the cookie
-  //   res.clearCookie("connect.sid", {
-  //     path: "/", // Path of the cookie
-  //     httpOnly: true,
-  //     secure: false, // Use true in production
-  //     // sameSite: "None", // Adjust based on your requirements
-  //   });
-
-  //   // Send success response
-  //   res.status(200).json({ msg: "Logout successful" });
-  // });
+export const logout = async (req, res, next) => {
+  try {
+    res.clearCookie("token", {
+      path: "/", // Path of the cookie
+      httpOnly: true,
+      secure: process.env.NODE_ENV == "production",
+      sameSite: process.env.NODE_ENV == "production" ? "none" : "",
+    });
+    res.status(200).json({ msg: "logout succesfull" });
+  } catch (err) {
+    let logoutErr = new ServerError("Failed to logout!!");
+    next(logoutErr);
+  }
 };

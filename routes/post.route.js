@@ -16,7 +16,7 @@ import {
   addComment,
 } from "../controllers/post.controller.js";
 import asyncWrapper from "../utils/asyncWrapper.js";
-import { verifyToken } from "../middleware/adminPermit.js";
+import { verifyToken } from "../middleware/verifyToken.js";
 import { uploader } from "../middleware/uploadImage.js";
 
 router.post("/create", verifyToken, asyncWrapper(createPost));

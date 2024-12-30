@@ -3,7 +3,7 @@ const router = express.Router();
 
 // imports
 import asyncWrapper from "../utils/asyncWrapper.js";
-import { verifyToken } from "../middleware/adminPermit.js";
+import { verifyToken } from "../middleware/verifyToken.js";
 import {
   createUser,
   deleteUser,
