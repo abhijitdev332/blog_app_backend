@@ -8,10 +8,10 @@ export const login = async (req, res, next) => {
   // check the mail its match with any
   let user = await UserModal.findOne({ email: email });
   if (!user) {
-    res.status(200).json({
+    logMessage(infoLogger, "No user found on this Email", { email });
+    return res.status(200).json({
       msg: "No found any user on this Email",
     });
-    logMessage(infoLogger, "No user found on this Email", { email });
   }
 
   try {
