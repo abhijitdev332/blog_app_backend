@@ -36,6 +36,6 @@ app.use("/auth", authRoutes);
 app.use("/post", postRoutes);
 app.use("/admin", adminRoutes);
 
-app.use("/*", globalError);
+app.use("*", globalError);
 
 export default app;
