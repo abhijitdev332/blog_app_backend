@@ -1,5 +1,5 @@
 import { UserModal } from "../models/user.model.js";
-import { AppError, DatabaseError, ServerError } from "../lib/customError.js";
+import { AppError, DatabaseError } from "../lib/customError.js";
 import { encrypt } from "../lib/encryptPass.js";
 export async function createUser(req, res, next) {
   const { username, email, password } = req.body;

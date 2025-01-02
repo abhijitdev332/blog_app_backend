@@ -5,6 +5,6 @@ export const updatePostStatusSchema = z.object({
 });
 
 export const updateUserRoleSchema = z.object({
-  roles: z.enum(["user", "admin", "moderator"]),
-  isActive: z.boolean(),
+  roles: z.enum(["user", "admin", "moderator"]).optional(),
+  isActive: z.boolean().optional(),
 });
