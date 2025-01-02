@@ -19,8 +19,18 @@ import {
 import asyncWrapper from "../utils/asyncWrapper.js";
 import { verifyToken } from "../middleware/verifyToken.js";
 import { uploader } from "../middleware/uploadImage.js";
+import { validateData } from "../middleware/schemaValidation.js";
+import {
+  postCreationSchema,
+  postCommentSchema,
+} from "../schemas/postSchema.js";
 
-router.post("/create", verifyToken, asyncWrapper(createPost));
+router.post(
+  "/create",
+  verifyToken,
+  validateData(postCreationSchema),
+  asyncWrapper(createPost)
+);
 router.post(
   "/upload",
   verifyToken,
@@ -33,7 +43,12 @@ router.get("/user/:userId", verifyToken, asyncWrapper(getUserPosts));
 router.get("/", asyncWrapper(getAllPublishPosts));
 router.get("/related/:id", asyncWrapper(getRelatedPost));
 router.get("/:id", asyncWrapper(getPost));
-router.put("/comment/:id", verifyToken, asyncWrapper(addComment));
+router.put(
+  "/comment/:id",
+  verifyToken,
+  validateData(postCommentSchema),
+  asyncWrapper(addComment)
+);
 router.put("/:id", verifyToken, asyncWrapper(UpdatePost));
 router.delete("/comment/:id", verifyToken, asyncWrapper(deleteComment));
 router.delete("/:id", verifyToken, asyncWrapper(deletePost));

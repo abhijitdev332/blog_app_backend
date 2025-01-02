@@ -155,7 +155,7 @@ const addComment = async (req, res, next) => {
     let postErr = new DatabaseError("Post Not Found!!");
     return next(postErr);
   }
-  getedPost.comments.push(req.body?.comments);
+  getedPost.comments.push(req.body?.comment);
   await getedPost.save();
   res.status(200).json({ msg: "Comment Added Successfully", data: getedPost });
 };

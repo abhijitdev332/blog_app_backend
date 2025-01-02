@@ -29,7 +29,7 @@ export async function createUser(req, res, next) {
 export async function getUser(req, res, next) {
   const { id } = req.params;
 
-  const matchedUser = await UserModal.findOne({ _id: id }, { password: -1 });
+  const matchedUser = await UserModal.findOne({ _id: id }, { password: 0 });
   if (!matchedUser) {
     let userErr = new AppError("can't find any user", 400);
     return next(userErr);
