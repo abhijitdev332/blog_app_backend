@@ -18,11 +18,7 @@ const getAdminAllPosts = async (req, res, next) => {
 const UpdatePostStatus = async (req, res, next) => {
   const { id } = req.params;
   const { status } = req.body;
-  let updatedPost = await postModal.findByIdAndUpdate(
-    id,
-    { status },
-    { new: true, runValidators: true }
-  );
+  let updatedPost = await postModal.findByIdAndUpdate(id, { status });
   if (!updatedPost) {
     let postErr = new DatabaseError("Failed to update the post", 500);
     return next(postErr);

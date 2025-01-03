@@ -76,15 +76,15 @@ const UpdatePost = async (req, res, next) => {
 
   let updatedPost = await postModal.findByIdAndUpdate(
     id,
-    { ...req.body },
+    { ...req.body, status: "draft" },
     { runValidators: true }
   );
-  updatedPost.updatePublish();
+  // updatedPost.updatePublish();
   if (!updatedPost) {
     let updateErr = new DatabaseError("Failed to update post!!");
     return next(updateErr);
   }
-  res.status(200).json({ msg: "success", data: updatedPost });
+  res.status(200).json({ msg: "Post Updated Successfully", data: updatedPost });
 };
 const addLike = async (req, res) => {
   const { id } = req.params;
