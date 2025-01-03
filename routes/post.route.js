@@ -23,6 +23,7 @@ import { validateData } from "../middleware/schemaValidation.js";
 import {
   postCreationSchema,
   postCommentSchema,
+  postUpdateSchema,
 } from "../schemas/postSchema.js";
 
 router.post(
@@ -49,7 +50,12 @@ router.put(
   validateData(postCommentSchema),
   asyncWrapper(addComment)
 );
-router.put("/:id", verifyToken, asyncWrapper(UpdatePost));
+router.put(
+  "/:id",
+  verifyToken,
+  validateData(postUpdateSchema),
+  asyncWrapper(UpdatePost)
+);
 router.delete("/comment/:id", verifyToken, asyncWrapper(deleteComment));
 router.delete("/:id", verifyToken, asyncWrapper(deletePost));
 
