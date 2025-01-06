@@ -48,7 +48,7 @@ export const logout = async (req, res, next) => {
       secure: process.env.NODE_ENV == "production",
       sameSite: process.env.NODE_ENV == "production" ? "none" : "",
     });
-    res.status(200).json({ msg: "logout succesfull" });
+    res.status(200).json({ msg: "Logout Successfully" });
   } catch (err) {
     let logoutErr = new ServerError("Failed to logout!!");
     next(logoutErr);

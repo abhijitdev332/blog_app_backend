@@ -5,7 +5,7 @@ const router = express.Router();
 import asyncWrapper from "../utils/asyncWrapper.js";
 import { verifyToken } from "../middleware/verifyToken.js";
 import { validateData } from "../middleware/schemaValidation.js";
-import { userCreationSchema } from "../schemas/userSchema.js";
+import { userCreationSchema, userUpdateSchema } from "../schemas/userSchema.js";
 import {
   createUser,
   deleteUser,
@@ -19,7 +19,12 @@ router.post(
   asyncWrapper(createUser)
 );
 router.get("/:id", asyncWrapper(getUser));
-router.put("/:id", verifyToken, asyncWrapper(updateUser));
+router.put(
+  "/:id",
+  verifyToken,
+  validateData(userUpdateSchema),
+  asyncWrapper(updateUser)
+);
 router.delete("/:id", verifyToken, asyncWrapper(deleteUser));
 
 export default router;

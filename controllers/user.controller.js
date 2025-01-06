@@ -1,4 +1,5 @@
 import { UserModal } from "../models/user.model.js";
+import { postModal } from "../models/post.model.js";
 import { AppError, DatabaseError } from "../lib/customError.js";
 import { encrypt } from "../lib/encryptPass.js";
 export async function createUser(req, res, next) {
@@ -64,12 +65,18 @@ export async function updateUser(req, res, next) {
 export async function deleteUser(req, res, next) {
   const { id } = req.params;
 
+  const userPosts = await postModal.find({ author: id });
+  if (userPosts?.length > 0) {
+    return res.status(400).json({
+      msg: "Can't Delete User Linked to Posts",
+    });
+  }
   const deletedUser = await UserModal.findByIdAndDelete(id);
   if (!deletedUser) {
     let serverErr = new DatabaseError("failed to delete user!!");
     return next(serverErr);
   }
   res.status(200).json({
-    msg: "user deleted successfully",
+    msg: "User deleted successfully",
   });
 }
